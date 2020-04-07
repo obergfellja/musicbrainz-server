@@ -84,7 +84,7 @@ foreach my $def (qw(
     SOLRCLOUD_BACKUP_LOCATION
 ))
 {
-    if (!defined DBDefs->$def || !DBDefs->$def)
+    if (!DBDefs->$def)
     {
         _error("$def is not set in DBDefs.");
         exit 78; # EX_CONFIG
