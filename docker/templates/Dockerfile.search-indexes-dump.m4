@@ -21,8 +21,6 @@ COPY docker/musicbrainz-search-indexes-dump/crontab /var/spool/cron/crontabs/mus
 RUN chown musicbrainz:musicbrainz /var/spool/cron/crontabs/musicbrainz && \
     chmod 600 /var/spool/cron/crontabs/musicbrainz
 
-COPY docker/scripts/start_musicbrainz_server.sh /usr/local/bin/
-
 copy_mb(`docker/templates/DBDefs.pm.ctmpl lib/')
 
 git_info
