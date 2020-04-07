@@ -290,9 +290,7 @@ sub _query_collections_api
 
     my $http_content = $http_response->decoded_content;
     my $solr_response = decode_json($http_content);
-    if (!defined $solr_response->{responseHeader}
-        || !defined $solr_response->{responseHeader}->{status}
-        || $solr_response->{responseHeader}->{status} ne '0')
+    if (($solr_response->{responseHeader}->{status} // '') ne '0')
     {
         _error(
             "Failed Solr request at '%s': Response '%s'",
