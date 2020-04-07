@@ -68,7 +68,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use DBDefs;
-use MusicBrainz::Script::MBDump;
+use MusicBrainz::Script::MBDump qw( gpg_sign );
 
 ################################################################################
 
@@ -168,7 +168,7 @@ EOF
         exit 70; # EX_SOFTWARE
     }
 
-    _gpg_sign("$working_dir/$tar_file");
+    gpg_sign("$working_dir/$tar_file");
 }
 
 for my $hash_program ('md5sum', 'sha256sum') {
@@ -183,7 +183,7 @@ for my $hash_program ('md5sum', 'sha256sum') {
         exit 70; # EX_SOFTWARE
     }
 
-    _gpg_sign("$working_dir/$hash_output_file");
+    gpg_sign("$working_dir/$hash_output_file");
 }
 
 _info 'Successfully bundled SolrCloud backups as search indexes dump.';
@@ -198,13 +198,6 @@ sub _write_file
     open(my $fh, '>' . $parent_dir . "/$file") or die $!;
     print $fh $contents or die $!;
     close $fh or die $!;
-}
-
-sub _gpg_sign
-{
-    my ($file_to_be_signed) = @_;
-
-    MusicBrainz::Script::MBDump::gpg_sign('dummy', $file_to_be_signed);
 }
 
 ## eof BundleSearchIndexesDump
