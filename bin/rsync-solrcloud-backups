@@ -6,7 +6,7 @@ set -u
 
 DESTINATION="$1"
 
-MB_SERVER_ROOT=$(cd "$(dirname "${BASH_RSYNC_SOLRCLOUD_BACKUPS_DIR[0]}")/../" && pwd)
+MB_SERVER_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)
 cd "$MB_SERVER_ROOT"
 
 source admin/config.sh
