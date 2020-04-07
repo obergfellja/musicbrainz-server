@@ -63,6 +63,8 @@ $SIG{'INT'} = sub { exit 3 };
 use JSON::XS qw( decode_json encode_json );
 use List::Util qw( sum );
 use POSIX qw( strftime );
+use URI;
+use URI::QueryParam;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib";
@@ -270,19 +272,20 @@ sub _query_collections_api
 {
     my ($action, $parameters) = @_;
 
-    my $url = $COLLECTIONS_API . '?action=' . $action;
+    my $uri = new URI->new($COLLECTIONS_API);
+    $uri->query_param('action' => $action);
     foreach my $key (keys %{$parameters})
     {
-        $url .= '&' . $key . '=' . $parameters->{$key};
+        $uri->query_param_append($key, $parameters->{$key});
     }
-    _debug "Querying '$url'";
+    _debug "Querying '$uri'";
 
-    my $http_response = $c->lwp->get($url);
+    my $http_response = $c->lwp->get($uri);
     if (!$http_response->is_success)
     {
         _error(
             "Failed HTTP request '%s': Error '%s'",
-            $url,
+            $uri,
             $http_response->status_line,
         );
         exit 70; # EX_SOFTWARE
@@ -294,7 +297,7 @@ sub _query_collections_api
     {
         _error(
             "Failed Solr request at '%s': Response '%s'",
-            $url,
+            $uri,
             $http_content,
         );
         exit 70; # EX_SOFTWARE
