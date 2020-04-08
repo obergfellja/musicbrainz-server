@@ -63,6 +63,7 @@ $SIG{'INT'} = sub { exit 3 };
 use JSON::XS qw( decode_json encode_json );
 use List::Util qw( sum );
 use POSIX qw( strftime );
+use Readonly;
 use URI;
 use URI::QueryParam;
 
@@ -91,20 +92,21 @@ foreach my $def (qw(
     }
 }
 
-my $COLLECTIONS_API = DBDefs->SOLRCLOUD_COLLECTIONS_API;
-my $BACKUP_LOCATION = DBDefs->SOLRCLOUD_BACKUP_LOCATION;
+Readonly my $COLLECTIONS_API = DBDefs->SOLRCLOUD_COLLECTIONS_API;
+Readonly my $BACKUP_LOCATION = DBDefs->SOLRCLOUD_BACKUP_LOCATION;
 
-my $BACKUP_STAMP = $ENV{BACKUP_STAMP} // strftime "%Y%m%d-%H%M%S", gmtime;
+Readonly my $BACKUP_STAMP = $ENV{BACKUP_STAMP} // strftime "%Y%m%d-%H%M%S", gmtime;
 
 my $c = MusicBrainz::Server::Context->create_script_context;
 
-#my %BACKUP_REQUEST_STATUS = (
-#    pending     => 'Backup request has not been sent yet',
-#    running     => 'Solr Cloud is processing backup request',
-#    completed   => 'Solr Cloud completely processed backup request',
-#);
+# pending   => Backup request has not been sent yet
+Readonly my $BACKUP_REQUEST_PENDING = 'pending';
+# running   => Solr Cloud is processing backup request
+Readonly my $BACKUP_REQUEST_RUNNING = 'running';
+# completed => Solr Cloud completely processed backup request
+Readonly my $BACKUP_REQUEST_COMPLETED = 'completed';
 
-my $collections = $sample_collection
+Readonly my $collections = $sample_collection
     ? [$sample_collection]
     : list_solr_collections();
 my %backup_requests;
@@ -132,7 +134,7 @@ sub prepare_backup_requests
         $backup_requests{$request_id} = {
             name => 'backup_' . $BACKUP_STAMP . '_' . $collection,
             collection => $collection,
-            status => 'pending',
+            status => $BACKUP_REQUEST_PENDING,
         };
         my $solr_response = _query_collections_api('REQUESTSTATUS', {
                 requestid => $request_id,
@@ -186,7 +188,7 @@ sub do_backup_collections
             _flush_running_requests_status();
             exit 70; # EX_SOFTWARE
         }
-        $backup_requests{$request_id}{status} = 'running';
+        $backup_requests{$request_id}{status} = $BACKUP_REQUEST_RUNNING;
     }
 }
 
@@ -195,7 +197,7 @@ sub wait_backup_complete
     while (
         sum
         map { $_ => 1 }
-        grep { $backup_requests{$_}{status} eq 'running' }
+        grep { $backup_requests{$_}{status} eq $BACKUP_REQUEST_RUNNING }
         keys %backup_requests
     )
     {
@@ -204,7 +206,7 @@ sub wait_backup_complete
         sleep $pause;
         foreach my $request_id (
             sort
-            grep { $backup_requests{$_}{status} eq 'running' }
+            grep { $backup_requests{$_}{status} eq $BACKUP_REQUEST_RUNNING }
             keys %backup_requests
         )
         {
@@ -230,7 +232,7 @@ sub wait_backup_complete
             }
             elsif ($solr_response->{status}->{state} eq 'completed')
             {
-                $backup_requests{$request_id}{status} = 'completed';
+                $backup_requests{$request_id}{status} = $BACKUP_REQUEST_COMPLETED;
                 _query_collections_api('DELETESTATUS', {
                         requestid => $request_id,
                     }
@@ -257,7 +259,7 @@ sub _flush_running_requests_status
 {
     foreach my $request_id (
         sort
-        grep { $backup_requests{$_}{status} eq 'running' }
+        grep { $backup_requests{$_}{status} eq $BACKUP_REQUEST_RUNNING }
         keys %backup_requests
     )
     {
