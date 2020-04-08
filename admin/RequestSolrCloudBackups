@@ -61,7 +61,6 @@ pod2usage(
 $SIG{'INT'} = sub { exit 3 };
 
 use JSON::XS qw( decode_json encode_json );
-use List::Util qw( sum );
 use POSIX qw( strftime );
 use Readonly;
 use URI;
@@ -195,8 +194,6 @@ sub do_backup_collections
 sub wait_backup_complete
 {
     while (
-        sum
-        map { $_ => 1 }
         grep { $backup_requests{$_}{status} eq $BACKUP_REQUEST_RUNNING }
         keys %backup_requests
     )
