@@ -139,7 +139,7 @@ for my $backup_dir (@backup_dirs)
     copy($license_file, "$working_dump_dir/COPYING") or die $!;
 
     my $readme_text = <<EOF;
-The files in the directory 'index' is a snapshot of the search index
+The files in the directory 'index' are a snapshot of the search index
 '$collection' from the official MusicBrainz, in a format suitable for
 use with an Apache Solr server.  To import them, you need a compatible
 version of the MusicBrainz simple Solr search server schema (mbsssss).
