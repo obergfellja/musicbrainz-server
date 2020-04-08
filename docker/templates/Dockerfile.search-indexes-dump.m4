@@ -3,7 +3,7 @@ m4_include(`server_base.m4')m4_dnl
 install_new_xz_utils
 
 RUN chown_mb(`/home/musicbrainz/log') && \
-    chown_mb(`/home/musicbrainz/search-indexes-dumps')
+    chown_mb(`/home/musicbrainz/search-index-dumps')
 
 copy_common_mbs_files
 
