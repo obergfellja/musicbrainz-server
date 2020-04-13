@@ -6,7 +6,7 @@ use warnings;
 use Getopt::Long qw( GetOptions );
 use Pod::Usage qw( pod2usage );
 
-################################################################################
+##########                             ___                            ##########
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ later version: http://www.gnu.org/licenses/gpl-2.0.txt
 
 =cut
 
-################################################################################
+##########                          .-*)) `*-.                        ##########
 
 my $working_dir;
 my $debug_flag;
@@ -56,7 +56,7 @@ pod2usage(
     -message => "$0: unrecognized arguments",
 ) if @ARGV;
 
-################################################################################
+##########                         /*  ((m   *'.                      ##########
 
 $SIG{'INT'} = sub { exit 3 };
 
@@ -70,7 +70,7 @@ use lib "$FindBin::Bin/../lib";
 use DBDefs;
 use MusicBrainz::Script::MBDump qw( gpg_sign );
 
-################################################################################
+##########                        |   i))  c   *\                     ##########
 
 sub _debug { print "[debug] ", (sprintf shift, @_), "\n" if $debug_flag; }
 sub _info { print "[info] ", (sprintf shift, @_), "\n"; }
@@ -114,6 +114,8 @@ my @public_domain_collections = qw(
     url
     work
 );
+
+##########                        | h  ((*   a  /                     ##########
 
 for my $backup_dir (@backup_dirs)
 {
@@ -171,6 +173,8 @@ EOF
     gpg_sign("$working_dir/$tar_file");
 }
 
+##########                         \  e))  l  .'                      ##########
+
 for my $hash_program ('md5sum', 'sha256sum') {
     my $hash_output_file = uc($hash_program . 's');
     chomp (my $hash_bin = `which g$hash_program` || `which $hash_program`);
@@ -189,7 +193,7 @@ for my $hash_program ('md5sum', 'sha256sum') {
 _info 'Successfully bundled SolrCloud backups as search indexes dump.';
 exit;
 
-################################################################################
+##########                          '-.((*_.-'                        ##########
 
 sub _write_file
 {
@@ -199,5 +203,3 @@ sub _write_file
     print $fh $contents or die $!;
     close $fh or die $!;
 }
-
-## eof BundleSearchIndexesDump
